@@ -1,4 +1,5 @@
-import pool from "../config/dbConn.js";
+import pool from "../../config/dbConn.js";
+
 
 const createTeacherTable = async () => {
   const queryText = `

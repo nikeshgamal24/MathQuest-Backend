@@ -8,8 +8,8 @@ export const createAccessToken = ({ user }) => {
     const accessToken = jwt.sign(
       {
         UserInfo: {
-          email: user.email,
-          id: user.id,
+          email: user.email || null,
+          id: user.id || user.roll_number,  // id for teacher and roll_number for student
         },
       },
       process.env.ACCESS_TOKEN_SECRET,

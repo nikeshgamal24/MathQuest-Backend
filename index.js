@@ -4,13 +4,11 @@ import dotenv from "dotenv";
 import pool from "./config/dbConn.js";
 
 import teacherRoute from "./routes/teacher-routes/teacherRoute.js";
-import customQuestionsRoute from "./routes/custom-questions/customQuestionsRoute.js";
-
+import studentRoute from "./routes/student-routes/studentRoute.js";
 import authRoute from "./routes/auth-routes/authRoute.js";
 import errorHandling from "./middlewares/errorHandler.js";
 import cookieParser from "cookie-parser";
-import createTeacherTable from "./data/createTeacherTable.js";
-import createCustomQuestionsTable from "./data/createCustomQuestions.js";
+import { setSystemDatabaseTables } from "./data/setSystemDatabaseTables.js";
 
 dotenv.config();
 
@@ -30,14 +28,15 @@ app.use("/api", authRoute);
 
 // Protected Routes
 app.use("/api/teacher", teacherRoute);
+app.use("/api/student", studentRoute);
+
 // app.use("/api/custom-questions", customQuestionsRoute);
 
 //Error handling middleware
 app.use(errorHandling);
 
 //Creating table before stating server
-createTeacherTable();
-createCustomQuestionsTable();
+setSystemDatabaseTables()
 
 //TESTING POSTGRES Connection
 app.get("/", async (req, res) => {

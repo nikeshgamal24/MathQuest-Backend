@@ -21,3 +21,13 @@ CREATE TABLE custom_questions (
     wrong_option3 VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create student table
+CREATE TABLE students (
+    CREATE TABLE students (
+    roll_number VARCHAR(255) PRIMARY KEY, -- roll_number is now the primary key
+    name VARCHAR(255) NOT NULL,
+    class VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+);

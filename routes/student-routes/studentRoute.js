@@ -1,0 +1,19 @@
+import express from "express";
+import verifyJWT from "../../middlewares/verifyJWT.js";
+import {
+  answerQuestion,
+  endQuiz,
+  getQuestionsToPlay,
+  getStudentAnswers,
+  startQuiz,
+} from "../../controllers/quizz-controllers/quizController.js";
+
+const router = express.Router();
+
+router.post("/quizzes/start", verifyJWT, startQuiz);
+router.post("/quizzes/answer", verifyJWT, answerQuestion);
+router.post("/quizzes/end", verifyJWT, endQuiz);
+router.get("/quizzes/questions", verifyJWT, getQuestionsToPlay);
+router.get("/quizzes/answers", verifyJWT, getStudentAnswers);
+
+export default router;

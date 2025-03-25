@@ -1,7 +1,7 @@
 // import { addCustomQuestion, getRandomQuestionsByDifficulty } from "../models/questionService.js";
 
 import handleResponse from "../../middlewares/handleResponse.js";
-import { addCustomQuestion } from "../../models/customQuestionModel.js";
+import { addCustomQuestionService } from "../../services/customQuestionServices.js";
 
 // Create a question
 export const createQuestion = async (req, res, next) => {
@@ -18,7 +18,7 @@ export const createQuestion = async (req, res, next) => {
 
     const teacher_id = req.userId; // Teacher ID from auth
 
-    const newQuestion = await addCustomQuestion({
+    const newQuestion = await addCustomQuestionService({
       teacher_id,
       operation,
       difficulty,

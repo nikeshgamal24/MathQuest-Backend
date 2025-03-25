@@ -7,8 +7,8 @@ export const createRefreshToken = ({ user }) => {
     const refreshToken = jwt.sign(
       {
         UserInfo: {
-          email: user.email,
-          id: user.id,
+          email: user.email || null,
+          id: user.id || user.roll_number,
         },
       },
       process.env.REFRESH_TOKEN_SECRET,
@@ -20,4 +20,3 @@ export const createRefreshToken = ({ user }) => {
     return null;
   }
 };
-

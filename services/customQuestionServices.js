@@ -1,7 +1,7 @@
 import pool from "../config/dbConn.js";
 
 // Add a custom question
-export const addCustomQuestion = async (questionData) => {
+export const addCustomQuestionService = async (questionData) => {
     try {
         const { teacher_id, operation, difficulty, question, correct_answer, wrong_option1, wrong_option2, wrong_option3 } = questionData;
         const result = await pool.query(

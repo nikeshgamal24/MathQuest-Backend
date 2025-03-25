@@ -28,17 +28,22 @@ const verifyJWT = async (req, res, next) => {
     const id = decoded.UserInfo.id;
 
     try {
-      const queryText = "SELECT id, email from teachers WHERE email = $1";
+      let queryText;
+      if (email) {
+        queryText = "SELECT id, email from teachers WHERE id = $1";
+      } else {
+        queryText = "SELECT * from students WHERE roll_number = $1";
+      }
 
-      const result = await pool.query(queryText, [email]);
+      const result = await pool.query(queryText, [id]);
       const freshUser = result.rows[0];
+      console.log("🚀 ~ jwt.verify ~ freshUser:", freshUser);
 
       if (!freshUser) return res.sendStatus(404); // Not found if no user is found
-      console.log("🚀 ~ jwt.verify ~ freshUser:", freshUser)
 
       req.email = email;
-      req.userId = freshUser.id; // Use 'id' from PostgreSQL result
-
+      req.userId = freshUser.id || freshUser.roll_number; // Use 'id' from PostgreSQL result
+      console.log("END of JWTVerify");
       next();
     } catch (error) {
       console.error(error);

@@ -1,8 +1,12 @@
 // backend/src/controllers/teacherController.js
 
 import handleResponse from "../../middlewares/handleResponse.js";
-import { deleteTeacherService, getAllTeachersService, getTeacherByIdService, updateTeacherService } from "../../models/teacherModel.js";
-
+import {
+  deleteTeacherService,
+  getAllTeachersService,
+  getTeacherByIdService,
+  updateTeacherService,
+} from "../../services/teacherServices.js";
 
 export const getAllTeachers = async (req, res, next) => {
   try {
@@ -12,7 +16,6 @@ export const getAllTeachers = async (req, res, next) => {
     }
     handleResponse(res, 200, "Fetched All Teachers Successfully", teachers);
   } catch (err) {
-   
     console.error("Error in getAllTeachers:", err);
     next(err);
   }

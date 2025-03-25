@@ -3,10 +3,13 @@ import {
   loginTeacherService,
   logoutTeacherService,
   registerTeacherService,
-} from "../../models/teacherModel.js";
+} from "../../services/teacherServices.js";
 import bcrypt from "bcrypt";
 import { setCookie } from "../../utils/create-set-tokens/setCookie.js";
-import pool from "../../config/dbConn.js";
+import {
+  loginStudentService,
+  registerStudentService,
+} from "../../services/studentServices.js";
 
 export const registerTeacher = async (req, res, next) => {
   try {
@@ -110,5 +113,53 @@ export const handleLogout = async (req, res, next) => {
   } catch (err) {
     console.error("Error in logoutTeacher:", err);
     next(err);
+  }
+};
+
+export const registerStudent = async (req, res, next) => {
+  try {
+    const { name, rollNumber, className } = req.body; // Rename 'class' to 'className' to match frontend
+
+    const newStudent = await registerStudentService({
+      name,
+      roll_number: rollNumber,
+      className,
+    });
+
+    handleResponse(res, 201, "Student registered successfully", newStudent);
+  } catch (error) {
+    if (error.code === "23505") {
+      // Unique constraint violation (roll_number)
+      return handleResponse(res, 409, "Roll number already exists");
+    }
+    console.error("Error in student registration:", error);
+    return handleResponse(res, 500, "Internal server error");
+  }
+};
+
+export const loginStudent = async (req, res, next) => {
+  try {
+    const { rollNumber } = req.body;
+
+    const { accessToken, refreshToken, student } = await loginStudentService(
+      rollNumber
+    );
+    console.log("🚀 ~ loginStudent ~ student:", student);
+
+    if (!student) {
+      return handleResponse(res, 401, "Invalid roll number");
+    }
+
+    if (!accessToken || !refreshToken || !student) {
+      return handleResponse(res, 401, "Invalid username or password");
+    }
+
+    // Set the refresh token cookie
+    setCookie(res, refreshToken);
+
+    res.json({ accessToken, student }); // Send the token and student data
+  } catch (error) {
+    console.error("Error in student login:", error);
+    return handleResponse(res, 500, "Internal server error");
   }
 };
