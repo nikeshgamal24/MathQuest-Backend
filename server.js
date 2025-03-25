@@ -9,6 +9,8 @@ import authRoute from "./routes/auth-routes/authRoute.js";
 import errorHandling from "./middlewares/errorHandler.js";
 import cookieParser from "cookie-parser";
 import { setSystemDatabaseTables } from "./data/setSystemDatabaseTables.js";
+import credentials from "./middlewares/credentials.js";
+import corsOptions from "./config/corsOptions.js";
 
 dotenv.config();
 
@@ -16,7 +18,11 @@ const app = express();
 const port = process.env.PORT || 3500;
 
 //middlewares
-app.use(cors());
+//middleware for access-control-allow credentials
+app.use(credentials);
+
+//Cross Origin Resource Sharing
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 
