@@ -20,6 +20,11 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 
+//open endpoint
+app.get("/", async (req, res) => {
+  res.send(`Server is running`);
+});
+
 // Routes (Unprotected)
 app.use("/api", authRoute);
 
