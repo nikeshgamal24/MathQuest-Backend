@@ -7,6 +7,7 @@ const createStudentTable = async () => {
     roll_number VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     class VARCHAR(255) NOT NULL,
+    refresh_token VARCHAR(255) UNIQUE DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
     `;
