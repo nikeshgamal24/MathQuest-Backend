@@ -1,6 +1,5 @@
 import pool from "../../config/dbConn.js";
 
-
 const createStudentTable = async () => {
   const queryText = `
    CREATE TABLE IF NOT EXISTS students (
@@ -12,7 +11,7 @@ const createStudentTable = async () => {
 );
     `;
   try {
-    pool.query(queryText);
+    await pool.query(queryText);
   } catch (err) {
     console.log("Error creating teachers table: ", err);
   }

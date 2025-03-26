@@ -10,10 +10,9 @@ const createStudentAnswers = async () => {
     is_correct BOOLEAN,
     answered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
     `;
   try {
-    pool.query(queryText);
+    await pool.query(queryText);
     // console.log("Teacher Table created or already exists");
   } catch (err) {
     console.log("Error creating teachers table: ", err);
