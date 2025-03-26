@@ -23,9 +23,12 @@ export const loginStudentService = async (rollNumber) => {
       [rollNumber]
     );
     const student = result.rows[0];
+    console.log("🚀 ~ loginStudentService ~ student:", student)
     // Generate tokens
     const accessToken = createAccessToken({ user: student });
     const refreshToken = createRefreshToken({ user: student });
+    console.log("🚀 ~ loginStudentService ~ accessToken:", accessToken)
+    console.log("🚀 ~ loginStudentService ~ refreshToken:", refreshToken)
 
     // Save refresh token to database
     await pool.query("UPDATE students SET refresh_token = $1 WHERE roll_number = $2", [

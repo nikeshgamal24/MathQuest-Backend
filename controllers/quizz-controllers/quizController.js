@@ -1,3 +1,4 @@
+import handleResponse from "../../middlewares/handleResponse.js";
 import {
   endQuizSession,
   getAnsweredQuestions,
@@ -9,8 +10,10 @@ import {
 // Start a quiz session
 export const startQuiz = async (req, res, next) => {
   try {
-    const { studentRollNumber } = req.body;
+    const studentRollNumber = req.userId;
+    console.log("🚀 ~ startQuiz ~ studentRollNumber:", studentRollNumber);
     const sessionId = await startQuizSession(studentRollNumber);
+    console.log("🚀 ~ startQuiz ~ sessionId:", sessionId);
     res.status(201).json({ sessionId });
   } catch (error) {
     next(error);
@@ -21,8 +24,17 @@ export const startQuiz = async (req, res, next) => {
 export const answerQuestion = async (req, res, next) => {
   try {
     const { sessionId, questionId, studentAnswer, isCorrect } = req.body;
-    await recordStudentAnswer(sessionId, questionId, studentAnswer, isCorrect);
-    res.sendStatus(204);
+    if (!sessionId || !questionId || !studentAnswer || !isCorrect) {
+      handleResponse(res, 400, "Required Fields are missing");
+    }
+    const result = await recordStudentAnswer(
+      sessionId,
+      questionId,
+      studentAnswer,
+      isCorrect
+    );
+    console.log("🚀 ~ answerQuestion ~ result:", result);
+    handleResponse(res, 200, "Answer Successfully Submitted");
   } catch (error) {
     next(error);
   }

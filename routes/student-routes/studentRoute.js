@@ -11,9 +11,9 @@ import {
 const router = express.Router();
 
 router.post("/quizzes/start", verifyJWT, startQuiz);
+router.get("/quizzes/questions", verifyJWT, getQuestionsToPlay);
 router.post("/quizzes/answer", verifyJWT, answerQuestion);
 router.post("/quizzes/end", verifyJWT, endQuiz);
-router.get("/quizzes/questions", verifyJWT, getQuestionsToPlay);
 router.get("/quizzes/answers", verifyJWT, getStudentAnswers);
 
 export default router;
