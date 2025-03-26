@@ -16,34 +16,66 @@ export const startQuizSession = async (studentRollNumber) => {
 };
 
 // Record student answer
+
 export const recordStudentAnswer = async (
-  sessionId,
-  questionId,
-  studentAnswer,
-  isCorrect
+  quizSessionId,
+  studentRollNumber,
+  answers // Now an array of answer objects
 ) => {
   try {
-    await pool.query(
-      `INSERT INTO student_answers (session_id, question_id, student_answer, is_correct) VALUES ($1, $2, $3, $4)`,
-      [sessionId, questionId, studentAnswer, isCorrect]
-    );
+    await pool.query("BEGIN"); // Start transaction
+
+    for (const answer of answers) {
+      const { questionId, studentAnswer, isCorrect } = answer;
+
+      if (
+        questionId === undefined ||
+        studentAnswer === undefined ||
+        isCorrect === undefined
+      ) {
+        throw new Error("Invalid answer object in the array.");
+      }
+
+      await pool.query(
+        `INSERT INTO student_answers (quiz_session_id, question_id, student_answer, is_correct, student_roll_number) VALUES ($1, $2, $3, $4, $5)`,
+        [quizSessionId, questionId, studentAnswer, isCorrect, studentRollNumber]
+      );
+    }
+
+    await pool.query("COMMIT"); // Commit transaction
     return true;
   } catch (error) {
-    console.error("Error recording student answer:", error);
-    throw error;
+    await pool.query("ROLLBACK"); // Rollback transaction on error
+    console.error("Error recording student answers:", error);
+    return false;
   }
 };
 
 // End quiz session and calculate score
-export const endQuizSession = async (sessionId) => {
+export const endQuizSession = async (quizSessionId) => {
   try {
     const result = await pool.query(
-      `UPDATE quiz_sessions SET end_time = NOW(), score = (
-                SELECT COUNT(*) FROM student_answers WHERE session_id = $1 AND is_correct = TRUE
-            ) WHERE id = $1 RETURNING score`,
-      [sessionId]
+      `SELECT
+        SUM(CASE
+          WHEN cq.difficulty = 'Easy' THEN 1
+          WHEN cq.difficulty = 'Medium' THEN 2
+          WHEN cq.difficulty = 'Hard' THEN 3
+          ELSE 0
+        END) AS score
+      FROM student_answers sa
+      JOIN custom_questions cq ON sa.question_id = cq.id
+      WHERE sa.quiz_session_id = $1 AND sa.is_correct = true`,
+      [quizSessionId]
     );
-    return result.rows[0].score;
+
+    const score = parseInt(result.rows[0]?.score || 0);
+
+    await pool.query(
+      `UPDATE quiz_sessions SET end_time = NOW(), score = $1 WHERE id = $2`,
+      [score, quizSessionId]
+    );
+
+    return score;
   } catch (error) {
     console.error("Error ending quiz session:", error);
     throw error;
@@ -57,12 +89,11 @@ export const getUnansweredQuestions = async (studentRollNumber, limit) => {
       `SELECT cq.* FROM custom_questions cq
              WHERE cq.id NOT IN (
                  SELECT sa.question_id FROM student_answers sa
-                 JOIN quiz_sessions qs ON sa.session_id = qs.id
+                 JOIN quiz_sessions qs ON sa.quiz_session_id = qs.id
                  WHERE qs.student_roll_number = $1
              ) ORDER BY RANDOM() LIMIT $2`,
       [studentRollNumber, limit]
     );
-    console.log("🚀 ~ getUnansweredQuestions ~ result:", result);
     return result.rows;
   } catch (error) {
     console.error("Error getting unanswered questions:", error);
@@ -76,7 +107,7 @@ export const getAnsweredQuestions = async (studentRollNumber) => {
     const result = await pool.query(
       `SELECT cq.*, sa.student_answer, sa.is_correct FROM custom_questions cq
              JOIN student_answers sa ON cq.id = sa.question_id
-             JOIN quiz_sessions qs ON sa.session_id = qs.id
+             JOIN quiz_sessions qs ON sa.quiz_session_id = qs.id
              WHERE qs.student_roll_number = $1`,
       [studentRollNumber]
     );

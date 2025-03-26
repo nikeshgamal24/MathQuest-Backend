@@ -1,14 +1,15 @@
 import pool from "../../config/dbConn.js";
 
-const createStudentAnswers = async () => {
+const createQuizSessions = async () => {
   const queryText = `
-  CREATE TABLE IF NOT EXISTS student_answers (
+CREATE TABLE IF NOT EXISTS student_answers (
     id SERIAL PRIMARY KEY,
-    session_id INTEGER REFERENCES quiz_sessions(id),
+    quiz_session_id INTEGER REFERENCES quiz_sessions(id),
     question_id INTEGER REFERENCES custom_questions(id),
-    student_answer VARCHAR(255) NOT NULL,
+    student_answer VARCHAR(255),
     is_correct BOOLEAN,
-    answered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    student_roll_number VARCHAR(255) REFERENCES students(roll_number),
+    UNIQUE (quiz_session_id, question_id, student_roll_number)
 );
     `;
   try {
@@ -19,4 +20,4 @@ const createStudentAnswers = async () => {
   }
 };
 
-export default createStudentAnswers;
+export default createQuizSessions;

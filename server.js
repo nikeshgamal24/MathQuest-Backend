@@ -11,6 +11,7 @@ import cookieParser from "cookie-parser";
 import { setSystemDatabaseTables } from "./data/setSystemDatabaseTables.js";
 import credentials from "./middlewares/credentials.js";
 import corsOptions from "./config/corsOptions.js";
+import leaderboardRoute from "./routes/leaderboard-routes/leaderboardRoute.js"
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.get("/", async (req, res) => {
 
 // Routes (Unprotected)
 app.use("/api", authRoute);
+app.use("/api/leaderboard", leaderboardRoute);
 
 // // JWT Authentication (Protected Routes)
 // app.use(verifyJWT);

@@ -119,14 +119,14 @@ export const handleLogout = async (req, res, next) => {
 export const registerStudent = async (req, res, next) => {
   try {
     const { name, rollNumber, className } = req.body; // Rename 'class' to 'className' to match frontend
-    console.log("🚀 ~ registerStudent ~ req.body:", req.body)
+    console.log("🚀 ~ registerStudent ~ req.body:", req.body);
 
     const newStudent = await registerStudentService({
       name,
       roll_number: rollNumber,
       className,
     });
-    console.log("🚀 ~ registerStudent ~ newStudent:", newStudent)
+    console.log("🚀 ~ registerStudent ~ newStudent:", newStudent);
 
     handleResponse(res, 201, "Student registered successfully", newStudent);
   } catch (error) {

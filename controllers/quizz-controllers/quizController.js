@@ -23,18 +23,33 @@ export const startQuiz = async (req, res, next) => {
 // Record student answer
 export const answerQuestion = async (req, res, next) => {
   try {
-    const { sessionId, questionId, studentAnswer, isCorrect } = req.body;
-    if (!sessionId || !questionId || !studentAnswer || !isCorrect) {
-      handleResponse(res, 400, "Required Fields are missing");
+    const { sessionId, answers } = req.body;
+    const studentRollNumber = req.userId;
+
+    if (
+      !sessionId ||
+      !answers ||
+      !Array.isArray(answers) ||
+      answers.length === 0
+    ) {
+      return handleResponse(
+        res,
+        400,
+        "Invalid request body. Answers array is missing or empty."
+      );
     }
+
     const result = await recordStudentAnswer(
       sessionId,
-      questionId,
-      studentAnswer,
-      isCorrect
+      studentRollNumber,
+      answers
     );
-    console.log("🚀 ~ answerQuestion ~ result:", result);
-    handleResponse(res, 200, "Answer Successfully Submitted");
+
+    if (!result) {
+      return handleResponse(res, 500, "Failed to record student answers.");
+    }
+
+    return handleResponse(res, 200, "Answers successfully submitted.");
   } catch (error) {
     next(error);
   }
@@ -63,7 +78,12 @@ export const getQuestionsToPlay = async (req, res, next) => {
     const limit = 20; // Number of questions per quiz
     const questions = await getUnansweredQuestions(studentRollNumber, limit);
     console.log("🚀 ~ getQuestionsToPlay ~ questions:", questions);
-    res.status(200).json(questions);
+    handleResponse(
+      res,
+      200,
+      "Fetched Unanswered Questions Successfully",
+      questions
+    );
   } catch (error) {
     next(error);
   }
@@ -72,9 +92,19 @@ export const getQuestionsToPlay = async (req, res, next) => {
 // Get answered questions
 export const getStudentAnswers = async (req, res, next) => {
   try {
-    const { studentRollNumber } = req.query;
+    const studentRollNumber = req.userId;
+    console.log(
+      "🚀 ~ getStudentAnswers ~ studentRollNumber:",
+      studentRollNumber
+    );
     const answers = await getAnsweredQuestions(studentRollNumber);
-    res.status(200).json(answers);
+    console.log("🚀 ~ getStudentAnswers ~ answers:", answers);
+    handleResponse(
+      res,
+      200,
+      "Fetched Attempted Questions Successfully",
+      answers
+    );
   } catch (error) {
     next(error);
   }

@@ -31,3 +31,26 @@ CREATE TABLE students (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 );
+
+
+-- Create student_answers table
+CREATE TABLE IF NOT EXISTS student_answers (
+    id SERIAL PRIMARY KEY,
+    quiz_session_id INTEGER REFERENCES quiz_sessions(id),
+    question_id INTEGER REFERENCES custom_questions(id),
+    student_answer VARCHAR(255),
+    is_correct BOOLEAN,
+    student_roll_number VARCHAR(255) REFERENCES students(roll_number),
+    UNIQUE (quiz_session_id, question_id, student_roll_number)
+);
+
+
+-- Create quiz_sessions table
+CREATE TABLE IF NOT EXISTS quiz_sessions (
+    id SERIAL PRIMARY KEY,
+    student_roll_number VARCHAR(255) REFERENCES students(roll_number),
+    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    end_time TIMESTAMP,
+    score INTEGER
+);
+
