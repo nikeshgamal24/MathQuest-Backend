@@ -2,6 +2,13 @@
 
 import handleResponse from "../../middlewares/handleResponse.js";
 import {
+  deleteQuestionService,
+  getQuestionsListService,
+  updateQuestionService,
+} from "../../services/customQuestionServices.js";
+import { getStudentPerformanceService } from "../../services/getStudentPerformanceService.js";
+import { questionHistoryService } from "../../services/questionsHistoryService.js";
+import {
   deleteStudentService,
   deleteTeacherService,
   getAllTeachersService,
@@ -119,6 +126,76 @@ export const getStudentDetails = async (req, res, next) => {
       "Fetched Student Details Successfully.",
       studentDetails
     );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getQuestionsList = async (req, res, next) => {
+  try {
+    const questions = await getQuestionsListService();
+    console.log("🚀 ~ getQuestionsList ~ questions:", questions);
+    handleResponse(res, 200, "Fetched Questions Successfully", questions);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateQuestion = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const {
+      question,
+      operation,
+      difficulty,
+      correctAnswer,
+      wrongOption1,
+      wrongOption2,
+      wrongOption3,
+    } = req.body;
+
+    const updatedQuestion = await updateQuestionService(
+      id,
+      question,
+      operation,
+      difficulty,
+      correctAnswer,
+      wrongOption1,
+      wrongOption2,
+      wrongOption3
+    );
+    handleResponse(res, 200, "Question updated successfully.", updatedQuestion); // Include updatedQuestion in the response
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteQuestion = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deletedQuestion = await deleteQuestionService(id);
+    console.log("🚀 ~ deleteQuestion ~ deletedQuestion:", deletedQuestion);
+    handleResponse(res, 200, "Question deleted successfully.", deletedQuestion);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const questionsHistory = async (req, res, next) => {
+  try {
+    const history = await questionHistoryService();
+    console.log("🚀 ~ questionsHistory ~ history:", history);
+    handleResponse(res, 200, "Fetched Questions History Sucessfully", history);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getStudentPerformance = async (req, res, next) => {
+  try {
+    const { rollNumber } = req.params; // Get rollNumber from request parameters
+    const studentPerformance = await getStudentPerformanceService(rollNumber);
+    handleResponse(res, 200, "Student performance retrieved successfully.", studentPerformance);
   } catch (error) {
     next(error);
   }
