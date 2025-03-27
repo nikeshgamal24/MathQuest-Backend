@@ -53,6 +53,10 @@ export const recordStudentAnswer = async (
 
 // End quiz session and calculate score
 export const endQuizSession = async (quizSessionId) => {
+  if (!quizSessionId) {
+    throw new Error("quizSessionId is required.");
+  }
+
   try {
     const result = await pool.query(
       `SELECT
@@ -70,6 +74,14 @@ export const endQuizSession = async (quizSessionId) => {
 
     const score = parseInt(result.rows[0]?.score || 0);
 
+    if (result.rows.length === 0) {
+      // No correct answers found, you may want to return 0 or a different error message
+      // Or you can leave as is, and the score will be 0.
+      console.log(
+        `No correct answers found for quizSessionId: ${quizSessionId}. Score set to 0.`
+      );
+    }
+
     await pool.query(
       `UPDATE quiz_sessions SET end_time = NOW(), score = $1 WHERE id = $2`,
       [score, quizSessionId]
@@ -77,7 +89,10 @@ export const endQuizSession = async (quizSessionId) => {
 
     return score;
   } catch (error) {
-    console.error("Error ending quiz session:", error);
+    console.error(
+      `Error ending quiz session (quizSessionId: ${quizSessionId}):`,
+      error
+    );
     throw error;
   }
 };

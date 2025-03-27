@@ -2,8 +2,11 @@
 
 import handleResponse from "../../middlewares/handleResponse.js";
 import {
+  deleteStudentService,
   deleteTeacherService,
   getAllTeachersService,
+  getStudentDetailsService,
+  getStudentListService,
   getTeacherByIdService,
   updateTeacherService,
 } from "../../services/teacherServices.js";
@@ -72,5 +75,51 @@ export const deleteTeacher = async (req, res, next) => {
   } catch (err) {
     console.error("Error in deleteTeacher:", err);
     next(err);
+  }
+};
+
+export const getStudentList = async (req, res, next) => {
+  try {
+    const students = await getStudentListService();
+    console.log("🚀 ~ getStudentList ~ students:", students);
+    handleResponse(res, 200, "Fetched Students List Successfully", students);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteStudent = async (req, res, next) => {
+  try {
+    const { rollNumber } = req.params;
+    console.log("🚀 ~ deleteStudent ~ rollNumber:", rollNumber);
+    const deletedStudent = await deleteStudentService(rollNumber);
+    console.log("🚀 ~ deleteStudent ~ deletedStudent:", deletedStudent);
+
+    if (deletedStudent) {
+      handleResponse(res, 200, "Student deleted successfully.", deletedStudent);
+    } else {
+      handleResponse(res, 404, "Student not found.");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getStudentDetails = async (req, res, next) => {
+  try {
+    const { rollNumber } = req.params;
+    const studentDetails = await getStudentDetailsService(rollNumber);
+    if (!studentDetails) {
+      // return res.status(404).json({ message: "Student not found." });
+      handleResponse(res, 404, "Student not found.", studentDetails);
+    }
+    handleResponse(
+      res,
+      200,
+      "Fetched Student Details Successfully.",
+      studentDetails
+    );
+  } catch (error) {
+    next(error);
   }
 };

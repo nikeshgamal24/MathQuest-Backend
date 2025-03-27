@@ -148,3 +148,88 @@ export const deleteTeacherService = async ({ id }) => {
     throw error;
   }
 };
+
+export const getStudentListService = async () => {
+  try {
+    const result = await pool.query(`
+      SELECT roll_number, name, class,created_at
+      FROM students
+      ORDER BY created_at DESC;
+    `);
+    return result.rows;
+  } catch (error) {
+    console.error("Error getting student list:", error);
+    throw error;
+  }
+};
+
+export const deleteStudentService = async (rollNumber) => {
+  try {
+    const result = await pool.query(
+      "DELETE FROM students WHERE roll_number = $1 RETURNING *",
+      [rollNumber]
+    );
+
+    if (result.rows.length > 0) {
+      // Return the deleted student details
+      return result.rows[0];
+    } else {
+      // Student not found, return null or throw an error
+      return null; // Or throw new Error("Student not found");
+    }
+  } catch (error) {
+    console.error("Error deleting student:", error);
+    throw error;
+  }
+};
+
+export const getStudentDetailsService = async (rollNumber) => {
+  try {
+    const queryText = `
+      SELECT
+          s.roll_number,
+          s.name,
+          COUNT(sa.question_id) AS total_questions_attempted,
+          SUM(CASE WHEN cq.difficulty = 'Easy' THEN 1 ELSE 0 END) AS easy_questions_attempted,
+          SUM(CASE WHEN cq.difficulty = 'Medium' THEN 1 ELSE 0 END) AS medium_questions_attempted,
+          SUM(CASE WHEN cq.difficulty = 'Hard' THEN 1 ELSE 0 END) AS hard_questions_attempted,
+          SUM(CASE WHEN sa.is_correct = true THEN 1 ELSE 0 END) AS correct_answers,
+          SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'Easy' THEN 1 ELSE 0 END) AS easy_correct,
+          SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'Medium' THEN 1 ELSE 0 END) AS medium_correct,
+          SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'Hard' THEN 1 ELSE 0 END) AS hard_correct,
+          (SELECT SUM(score) FROM quiz_sessions WHERE student_roll_number = s.roll_number) AS total_score, 
+          ROUND((SUM(CASE WHEN sa.is_correct = true THEN 1 ELSE 0 END) * 100.0 / COUNT(sa.question_id)), 2) AS accuracy,
+          ROUND(AVG(EXTRACT(EPOCH FROM (qs.end_time - qs.start_time))), 2) AS average_time_seconds,
+          JSON_AGG(
+              JSON_BUILD_OBJECT(
+                  'question_id', cq.id,
+                  'question', cq.question,
+                  'operation', cq.operation,
+                  'difficulty', cq.difficulty,
+                  'correct_answer', cq.correct_answer,
+                  'student_answer', sa.student_answer,
+                  'is_correct', sa.is_correct
+              )
+          ) AS attempted_questions
+      FROM
+          students s
+      LEFT JOIN
+          quiz_sessions qs ON s.roll_number = qs.student_roll_number
+      LEFT JOIN
+          student_answers sa ON qs.id = sa.quiz_session_id
+      LEFT JOIN
+          custom_questions cq ON sa.question_id = cq.id
+      WHERE
+          s.roll_number = $1
+      GROUP BY
+          s.roll_number, s.name;
+      `;
+    const result = await pool.query(queryText, [rollNumber]);
+    console.log("Raw Query Result:", result.rows[0]); // Add this line for debugging
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error getting student details:", error);
+    throw error;
+  }
+};
+
