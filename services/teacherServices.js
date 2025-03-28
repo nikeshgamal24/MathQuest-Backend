@@ -165,17 +165,22 @@ export const getStudentListService = async () => {
 
 export const deleteStudentService = async (rollNumber) => {
   try {
+    // 1. Delete associated records from student_answers
+    await pool.query("DELETE FROM student_answers WHERE quiz_session_id IN (SELECT id FROM quiz_sessions WHERE student_roll_number = $1)", [rollNumber]);
+
+    // 2. Delete associated records from quiz_sessions
+    await pool.query("DELETE FROM quiz_sessions WHERE student_roll_number = $1", [rollNumber]);
+
+    // 3. Delete the student
     const result = await pool.query(
       "DELETE FROM students WHERE roll_number = $1 RETURNING *",
       [rollNumber]
     );
 
     if (result.rows.length > 0) {
-      // Return the deleted student details
       return result.rows[0];
     } else {
-      // Student not found, return null or throw an error
-      return null; // Or throw new Error("Student not found");
+      return null;
     }
   } catch (error) {
     console.error("Error deleting student:", error);
