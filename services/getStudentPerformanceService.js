@@ -13,59 +13,59 @@ export const getStudentPerformanceService = async (rollNumber) => {
                 (SUM(CASE WHEN sa.is_correct = true THEN 1 ELSE 0 END) * 100.0 / COUNT(sa.question_id)),
                 2
             ) AS accuracy,
-            SUM(CASE WHEN cq.difficulty = 'Easy' THEN 1 ELSE 0 END) AS easy_questions_attempted,
-            SUM(CASE WHEN cq.difficulty = 'Medium' THEN 1 ELSE 0 END) AS medium_questions_attempted,
-            SUM(CASE WHEN cq.difficulty = 'Hard' THEN 1 ELSE 0 END) AS hard_questions_attempted,
-            SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'Easy' THEN 1 ELSE 0 END) AS easy_correct,
-            SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'Medium' THEN 1 ELSE 0 END) AS medium_correct,
-            SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'Hard' THEN 1 ELSE 0 END) AS hard_correct,
+            SUM(CASE WHEN cq.difficulty = 'easy' THEN 1 ELSE 0 END) AS easy_questions_attempted,
+            SUM(CASE WHEN cq.difficulty = 'medium' THEN 1 ELSE 0 END) AS medium_questions_attempted,
+            SUM(CASE WHEN cq.difficulty = 'hard' THEN 1 ELSE 0 END) AS hard_questions_attempted,
+            SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'easy' THEN 1 ELSE 0 END) AS easy_correct,
+            SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'medium' THEN 1 ELSE 0 END) AS medium_correct,
+            SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'hard' THEN 1 ELSE 0 END) AS hard_correct,
             ROUND(
                 (
-                    SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'Easy' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.difficulty = 'Easy' THEN 1 ELSE 0 END), 0)
+                    SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'easy' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.difficulty = 'easy' THEN 1 ELSE 0 END), 0)
                 ),
                 2
             ) AS easy_accuracy,
             ROUND(
                 (
-                    SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'Medium' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.difficulty = 'Medium' THEN 1 ELSE 0 END), 0)
+                    SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'medium' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.difficulty = 'medium' THEN 1 ELSE 0 END), 0)
                 ),
                 2
             ) AS medium_accuracy,
             ROUND(
                 (
-                    SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'Hard' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.difficulty = 'Hard' THEN 1 ELSE 0 END), 0)
+                    SUM(CASE WHEN sa.is_correct = true AND cq.difficulty = 'hard' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.difficulty = 'hard' THEN 1 ELSE 0 END), 0)
                 ),
                 2
             ) AS hard_accuracy,
-            SUM(CASE WHEN cq.operation = 'Addition' THEN 1 ELSE 0 END) AS addition_questions,
-            SUM(CASE WHEN cq.operation = 'Subtraction' THEN 1 ELSE 0 END) AS subtraction_questions,
-            SUM(CASE WHEN cq.operation = 'Multiplication' THEN 1 ELSE 0 END) AS multiplication_questions,
-            SUM(CASE WHEN cq.operation = 'Division' THEN 1 ELSE 0 END) AS division_questions,
-            SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'Addition' THEN 1 ELSE 0 END) AS addition_correct,
-            SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'Subtraction' THEN 1 ELSE 0 END) AS subtraction_correct,
-            SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'Multiplication' THEN 1 ELSE 0 END) AS multiplication_correct,
-            SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'Division' THEN 1 ELSE 0 END) AS division_correct,
+            SUM(CASE WHEN cq.operation = 'addition' THEN 1 ELSE 0 END) AS addition_questions,
+            SUM(CASE WHEN cq.operation = 'subtraction' THEN 1 ELSE 0 END) AS subtraction_questions,
+            SUM(CASE WHEN cq.operation = 'multiplication' THEN 1 ELSE 0 END) AS multiplication_questions,
+            SUM(CASE WHEN cq.operation = 'division' THEN 1 ELSE 0 END) AS division_questions,
+            SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'addition' THEN 1 ELSE 0 END) AS addition_correct,
+            SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'subtraction' THEN 1 ELSE 0 END) AS subtraction_correct,
+            SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'multiplication' THEN 1 ELSE 0 END) AS multiplication_correct,
+            SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'division' THEN 1 ELSE 0 END) AS division_correct,
             ROUND(
                 (
-                    SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'Addition' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.operation = 'Addition' THEN 1 ELSE 0 END), 0)
+                    SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'addition' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.operation = 'addition' THEN 1 ELSE 0 END), 0)
                 ),
                 2
             ) AS addition_accuracy,
             ROUND(
                 (
-                    SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'Subtraction' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.operation = 'Subtraction' THEN 1 ELSE 0 END), 0)
+                    SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'subtraction' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.operation = 'subtraction' THEN 1 ELSE 0 END), 0)
                 ),
                 2
             ) AS subtraction_accuracy,
             ROUND(
                 (
-                    SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'Multiplication' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.operation = 'Multiplication' THEN 1 ELSE 0 END), 0)
+                    SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'multiplication' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.operation = 'multiplication' THEN 1 ELSE 0 END), 0)
                 ),
                 2
             ) AS multiplication_accuracy,
             ROUND(
                 (
-                    SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'Division' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.operation = 'Division' THEN 1 ELSE 0 END), 0)
+                    SUM(CASE WHEN sa.is_correct = true AND cq.operation = 'division' THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(CASE WHEN cq.operation = 'division' THEN 1 ELSE 0 END), 0)
                 ),
                 2
             ) AS division_accuracy

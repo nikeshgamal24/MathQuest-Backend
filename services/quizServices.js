@@ -61,9 +61,9 @@ export const endQuizSession = async (quizSessionId) => {
     const result = await pool.query(
       `SELECT
         SUM(CASE
-          WHEN cq.difficulty = 'Easy' THEN 1
-          WHEN cq.difficulty = 'Medium' THEN 2
-          WHEN cq.difficulty = 'Hard' THEN 3
+          WHEN cq.difficulty = 'easy' THEN 1
+          WHEN cq.difficulty = 'medium' THEN 2
+          WHEN cq.difficulty = 'hard' THEN 3
           ELSE 0
         END) AS score
       FROM student_answers sa
