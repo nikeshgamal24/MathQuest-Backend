@@ -13,7 +13,7 @@ const router = express.Router();
 router.get("/quizzes/start", verifyJWT, startQuiz);
 router.get("/quizzes/questions", verifyJWT, getQuestionsToPlay);
 router.post("/quizzes/answer", verifyJWT, answerQuestion);
-router.post("/quizzes/end", verifyJWT, endQuiz);
+router.get("/quizzes/end/:sessionId", verifyJWT, endQuiz);
 router.get("/quizzes/answers", verifyJWT, getStudentAnswers);
 
 export default router;

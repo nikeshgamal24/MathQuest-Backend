@@ -58,7 +58,7 @@ export const answerQuestion = async (req, res, next) => {
 // End quiz session
 export const endQuiz = async (req, res, next) => {
   try {
-    const { sessionId } = req.body;
+    const { sessionId } = req.params;
     const score = await endQuizSession(sessionId);
     res.status(200).json({ score });
   } catch (error) {
