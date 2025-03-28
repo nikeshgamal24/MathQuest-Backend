@@ -97,12 +97,12 @@ export const updateQuestionService = async (
 
 export const deleteQuestionService = async (id) => {
   try {
-    // Delete related student answers first
-    await pool.query("DELETE FROM student_answers WHERE question_id = $1", [
-      id,
-    ]);
+    await pool.query("BEGIN"); // Start a transaction
 
-    // Then delete the question
+    // 1. Delete related student answers first
+    await pool.query("DELETE FROM student_answers WHERE question_id = $1", [id]);
+
+    // 2. Then delete the question
     const result = await pool.query(
       `
       DELETE FROM custom_questions
@@ -111,8 +111,11 @@ export const deleteQuestionService = async (id) => {
       `,
       [id]
     );
+
+    await pool.query("COMMIT"); // Commit the transaction
     return result.rows[0];
   } catch (error) {
+    await pool.query("ROLLBACK"); // Roll back the transaction if an error occurs
     console.error("Error deleting question:", error);
     throw error;
   }
